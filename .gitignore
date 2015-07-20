@@ -1,12 +1,23 @@
 # doc pdf ignore
 doc/tex/doc.pdf
 
+# ignore settings
+code/np_skeleton/.settings
+
 # ignore vpp shit
 np-project.vpp\~*
 
 # ignore classpath
 code/np_skeleton/.classpath
 
+# ignore latex mist
+.DS_Store
+*.fdb_latexmk
+*.synctex.gz
+*.aux
+*.log
+*.out
+*.DS_Store
 
 
 #### joe made this: https://goel.io/joe

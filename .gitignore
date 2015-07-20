@@ -3,9 +3,11 @@ doc/tex/doc.pdf
 
 # ignore settings
 code/np_skeleton/.settings
+code/np_skeleton/bin/.gitignore
 
 # ignore vpp shit
 np-project.vpp\~*
+doc/np-project.vpp.working
 
 # ignore classpath
 code/np_skeleton/.classpath

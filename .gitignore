@@ -1,6 +1,11 @@
 # doc pdf ignore
 doc/tex/doc.pdf
 
+# ignore vpp shit
+np-project.vpp\~*
+
+# ignore classpath
+code/np_skeleton/.classpath
 
 
 
@@ -69,7 +74,8 @@ target/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

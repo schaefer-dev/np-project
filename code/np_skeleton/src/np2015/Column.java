@@ -12,6 +12,8 @@ public class Column implements Runnable{
 	private int barrierCount;
 	private boolean preciseTest;
 	private CyclicBarrier barrier1;
+    private CyclicBarrier barrier2;
+    private CyclicBarrier barrier3;
 
 	public Column(int size, Picture matrix){
 		this.size = size;

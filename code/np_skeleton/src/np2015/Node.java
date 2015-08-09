@@ -16,7 +16,7 @@ public class Node {
 	private double akkuRight;
 	private Column myColumn;
 	
-	public Node(Column myColumn, int x, int y, double value,int rateTop, int rateBottom, int rateLeft, int rateRight){
+	public Node(Column myColumn, int x, int y, double value,double rateTop, double rateBottom, double rateLeft, double rateRight){
 		this.x = x;
 		this.y = y;
 		this.value = value;
@@ -26,25 +26,6 @@ public class Node {
 		this.rateLeft = rateLeft;
 		this.rateRight = rateRight;
 		this.rateTop = rateTop;
-	}
-	
-	/*
-	 * Communicate schiebt die Akkumulatoren aus this auf die Knoden right und left. Dazu wird in left bzw right die Methode changeValue aufgerufen.
-	 * Am ende Nullen wir die uebertragenen Akkumulatoren.
-	 * 
-	 * wichtiger Sonderfall wenn wir hier als nachbarnode right einen noch nicht existierenden node erhalten koennen wir an dieser stelle direkt einen neuen
-	 * Node erstellen und dann right=newNode ... setzen mit enstsprechenden Koordinaten und value. Wir muessen uns vorher noch die rates des Knotens besorgen!
-	 */
-	public void communicate(Node left, Node right){
-		//TODO
-	}
-	
-	
-	/*
-	 * siehe communicate() aber in der Vertikalen
-	 */
-	public void flow(Node top, Node bottom){
-		//TODO
 	}
 	
 	

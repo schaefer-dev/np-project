@@ -2,6 +2,7 @@ package np2015;
 
 import java.util.ArrayList;
 import java.util.concurrent.CyclicBarrier;
+import np2015.Node;
 
 public class Column implements Runnable{
 	private Column leftColumn;
@@ -26,6 +27,46 @@ public class Column implements Runnable{
 	public void setNeighbour(Column left, Column right){
 		this.leftColumn = left;
 		this.rightColumn = right;
+	}
+	
+	/*
+	 * Communicate schiebt die Akkumulatoren aus this auf die Knoden right und left. Dazu wird in left bzw right die Methode changeValue aufgerufen.
+	 * Am ende Nullen wir die uebertragenen Akkumulatoren.
+	 * 
+	 * wichtiger Sonderfall wenn wir hier als nachbarnode right einen noch nicht existierenden node erhalten koennen wir an dieser stelle direkt einen neuen
+	 * Node erstellen und dann right=newNode ... setzen mit enstsprechenden Koordinaten und value. Wir muessen uns vorher noch die rates des Knotens besorgen!
+	 */
+	public void communicate(Node node, Node left, Node right){
+		//TODO
+	}
+	
+	
+	/*
+	 * siehe communicate() aber in der Vertikalen
+	 */
+	public void flow(Node node, Node top, Node bottom){
+		//TODO
+	}
+	
+	/*
+	 * wir erstellen einen neuen Node in this, da von beiden benachbarten spalten ein aufruf dieser methode potentiell gleichzeitig
+	 * passieren koennte muss die methode synchronized sein! Zu beginn der Methode muessen wir trotzdem ueberpruefen ob der Node
+	 * nicht doch gerade erst erstellt wurde. In diesem Fall wuerden wiir einfach value auf die value des nodes addieren.
+	 * Falls der knoten noch nicht 'da ist' erstellen wir einen neuen und hohlen uns wie gehabt aus guarded commands die flowrate usw.
+	 * 
+	 * der erstellte knoten wird in die nodelist hinzugefuegt
+	 */
+	public synchronized void  createNewNode(int x, int y, double value){
+		if (nodeList.get(y)==null){
+			double rateTop = matrix.graph.getRateForTarget(x, y, Neighbor.Top);
+			double rateBottom = matrix.graph.getRateForTarget(x, y, Neighbor.Bottom);
+			double rateLeft = matrix.graph.getRateForTarget(x, y, Neighbor.Left);
+			double rateRight = matrix.graph.getRateForTarget(x, y, Neighbor.Right);
+			Node node = new Node(this, x, y, value, rateTop, rateBottom, rateLeft, rateRight);
+		}
+		else{
+			nodeList.get(y).changeValue(value);
+		}
 	}
 	
 	

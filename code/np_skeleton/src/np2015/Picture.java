@@ -16,6 +16,7 @@ public class Picture implements ImageConvertible{
 	private final ArrayList<Column> columnList;
 	private int barriercount;
 	public final double epsilon;
+	public GraphInfo graph;
 	
 	
 	
@@ -27,7 +28,8 @@ public class Picture implements ImageConvertible{
 	 * Im Konstruktor erstellen wir bereits alle benoetigten Spalten und Nodes die fuer das 'momentane' Bild relevant sind.
 	 * 
 	 */
-	public Picture(int width, int height, int x, int y, double value, double epsilon, int barriercount){
+	public Picture(GraphInfo graph, int width, int height, int x, int y, double value, double epsilon, int barriercount){
+		this.graph = graph;
 		this.width = width;
 		this.height = height;
 		this.barriercount = barriercount;

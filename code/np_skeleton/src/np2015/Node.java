@@ -56,4 +56,41 @@ public class Node {
 		return Math.abs(value_old - value);
 	}
 
+
+	public double getAkkuTop() {
+		return akkuTop;
+	}
+
+	public double getAkkuBottom() {
+		return akkuBottom;
+	}
+
+	public double getAkkuLeft() {
+		return akkuLeft;
+	}
+
+
+	public double getAkkuRight() {
+		return akkuRight;
+	}
+
+
+	public int getX() {
+		return x;
+	}
+
+
+	public int getY() {
+		return y;
+	}
+
+	public void setFlowAkkuZero(){
+		akkuTop = 0;
+		akkuBottom = 0;
+	}
+	
+	public void setCommunicateAkkuZero(){
+		akkuLeft = 0;
+		akkuRight = 0;
+	}
 }

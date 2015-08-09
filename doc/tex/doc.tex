@@ -58,7 +58,16 @@ Wichtig ist zu erwaehnen das jede Spalte fuer sich nebenlaeufig rechnet, innerha
 Anbei fuegen wir noch ein kleines Klassendiagram an, das wir fuer uns selbst entworfen haben um uebersichtlich zu sehen welche Methoden wir in welcher Klasse implementieren wollten.
 
 Korrektur:\\
-Wir verwenden die Klasse Cyclic barrier. Diese wird mit der Anzahl an threads initialisiert und befindet sich in Picture. Der Klasse wird zudem ein Runnable uebergeben dass das communicate auf den threats in seiner run methode steuert, da cyclic barrier ermoeglicht eine zusatzliche run methode nach erreichen der barrier zu setzen.
+Wir verwenden die Klasse Cyclic barrier. Diese wird mit der Anzahl an threads initialisiert und befindet sich in Picture. Der Klasse wird zudem ein Runnable uebergeben dass das communicate auf den threats in seiner run methode steuert, da cyclic barrier ermoeglicht eine zusatzliche run methode nach erreichen der barrier zu setzen. Vor dem Durchfuehren der communicate aktion ist die Barrier ebenso dafuer zusataendig in jedem Threat zu testen ob inflow = outflow. Falls dies true sein sollte.\\
+
+
+genaue abfolge bei anlauf der barrier:\\
+1. Moeglichkeit: Barrier das allererste mal angelaufen wird
+\begin{itemize}
+	\item Wir testen fuer jede Spalte ob inflow = outflow
+	\item wir rufen startCommunicate auf den spalten auf, diese communicaten dabei ihre akkumulatoren auf die linken und rechten nachbarnodes (die akkumulatoren werden nach uebertragen natuerlich an dieser stelle genullt). Es ist an dieser stelle wichtig dass startCommunicate und communicte auf den nodes NICHT syncronized ist. Lediglich der changevalue() part der der uebertragen eines akkus in einen node realisiert ist syncronized da theoretisch von beiden seiten gleichzeitig ge-changed werden koennte.
+
+\end{itemize}
 
 \newpage
 % TODO hier pdf include

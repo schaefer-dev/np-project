@@ -33,7 +33,13 @@ public class Node {
 	 * berechnet die Werte aller seiner akkumulatoren mit Hilfe von value und flowrates
 	 */
 	public void calculate(){
-		//TODO
+		akkuTop = value * rateTop;
+		akkuBottom = value * rateBottom;
+		double akkuLeftChange = value * rateLeft;
+		akkuLeft = akkuLeft + akkuLeftChange;
+		double akkuRightChange = value * rateRight;
+		akkuRight = akkuRight + akkuRightChange ;
+		value = value - (akkuTop + akkuBottom + akkuRightChange + akkuLeftChange );
 	}
 	
 	/*

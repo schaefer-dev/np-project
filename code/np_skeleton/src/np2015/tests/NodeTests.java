@@ -10,15 +10,16 @@ import java.nio.file.Paths;
 import np2015.GraphInfo;
 import np2015.Node;
 import np2015.Picture;
+import np2015.GuardedCommand;
 
 import org.junit.Test;
 
 import com.google.gson.Gson;
 
-public class TestPicture {
+public class NodeTests {
 
 	@Test
-	public void PictureConstruction1() {
+	public void nodeRates() {
 		
 		Gson gson = new Gson();
 		String json = "";
@@ -41,17 +42,17 @@ public class TestPicture {
 		
 		Picture pic = new Picture(ginfo,width, height,1,1,value,epsilon,barriercount);
 		
-		assertTrue(value == pic.getValueAt(1, 1));
-		assertTrue(0.0 == pic.getValueAt(0, 1));
-		assertTrue(0.0 == pic.getValueAt(1, 0));
-		assertTrue(0.0 == pic.getValueAt(1, 2));
-		assertTrue(0.0 == pic.getValueAt(2, 1));
+		Node node = pic.columnList.get(1).nodeList.get(1);
+			
+		node.calculate();
 		
-		for (int y = 2; y < 6; y++)
-			for (int x = 2; x < 6; x++)
-				assertTrue(0.0 == pic.getValueAt(y, x));
+		double flowRateTop = (node.getAkkuTop());
+		double flowRateBottom = (node.getAkkuBottom());
+		double flowRateLeft = (node.getAkkuLeft());
+		double flowRateRight = (node.getAkkuRight());
+		
+		assertTrue(node.getValue() < 1);
 		
 	}
-
 
 }

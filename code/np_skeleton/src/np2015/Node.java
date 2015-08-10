@@ -93,4 +93,24 @@ public class Node {
 		akkuLeft = 0;
 		akkuRight = 0;
 	}
+
+
+	public double getValue() {
+		return value;
+	}
+
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+
+
+	public double getValue_old() {
+		return value_old;
+	}
+
+
+	public void setValue_old(double value_old) {
+		this.value_old = value_old;
+	}
 }

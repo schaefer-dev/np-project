@@ -1,13 +1,15 @@
 package np2015;
 
 import java.util.ArrayList;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+
 import np2015.Node;
 
 public class Column implements Runnable{
 	private Column leftColumn;
 	private Column rightColumn;
-	private ArrayList<Node> nodeList;   // wir starten mit y = 0 'unten' in der matrix
+	private ArrayList<Node> nodeList;   // wir starten mit y = 0, x = 0 'oben links' in der matrix
 	private final int size;
 	private final Picture matrix;
 	private int barrierCount;
@@ -15,12 +17,17 @@ public class Column implements Runnable{
 	private CyclicBarrier barrier1;
     private CyclicBarrier barrier2;
     private CyclicBarrier barrier3;
+    private boolean terminated;
 
-	public Column(int size, Picture matrix){
+	public Column(int size, Picture matrix, CyclicBarrier barrier1, CyclicBarrier barrier2, CyclicBarrier barrier3){
 		this.size = size;
 		this.matrix = matrix;
-		this.nodeList = new ArrayList<Node>();
+		this.nodeList = new ArrayList<Node>(size);
 		this.preciseTest = false;
+		this.barrier1 = barrier1;
+		this.barrier2 = barrier2;
+		this.barrier3 = barrier3;
+		this.terminated = false;
 		//TODO nodeList hier initialisieren mit der entsprechenden maimalen laenge
 	}
 	
@@ -28,6 +35,13 @@ public class Column implements Runnable{
 		this.leftColumn = left;
 		this.rightColumn = right;
 	}
+	
+	public void terminate(){
+		terminated = true;
+	}
+	
+	
+	
 	
 	/*
 	 * Communicate schiebt die Akkumulatoren aus this auf die Knoden right und left. Dazu wird in left bzw right die Methode changeValue aufgerufen.
@@ -155,6 +169,32 @@ public class Column implements Runnable{
 	
 	
 	/*
+	 * startet Iteration ueber jeden Knoten, in dem dann calculate auf dem Node aufgerufen wird.
+	 */
+	private void startCalculate(){
+		int height = matrix.height;
+		for (int i = 0; i < height; i++){
+			Node node = nodeList.get(i);
+			if (node != null)
+				node.calculate();
+		}
+	}
+	
+	
+	/*
+	 * startet Iteration ueber jeden Knoten um value_old zu speichern / zu 'erneuern'
+	 */
+	private void startPreciseTest() {
+		int height = matrix.height;
+		for (int i = 0; i < height; i++){
+			Node node = nodeList.get(i);
+			if (node != null)
+				node.setValue_old(node.getValue());
+		}
+		
+	}
+	
+	/*
 	 * wir checken lokale Konvergenz indem wir fuer die Spalte testen ob inflow = outflow +- epsilon
 	 */
 	private boolean checkLocalTerminate(){
@@ -215,7 +255,8 @@ public class Column implements Runnable{
 	 * im ersten Schritt wird fuer jeden enthaltenen Node zuerst einmal calculate() aufgerufen, anschliessend einmal flow() auf allen um den Ausstausch
 	 * innerhalb der Spalte zu realisieren. Nach barriercount Durchlaeufen tritt der Threat in die Barrier barrier1 ein. Wenn alle Column-threats die Barrier
 	 * erreicht haben testet die Barrier ob preciseTest != true. Falls das gilt checkt die Barrier die Spaltenterminierung indem sie auf jeder Spalte
-	 * checkLocalTest() aufruft. Falls dies fuer jede Spalte true ist setzt die spalte precisetest = true ueber die methode startPreciseTest() in Picture.
+	 * checkLocalTest() aufruft. Falls dies fuer jede Spalte true ist setzt die barrier fuer jede Spalte precisetest = true ueber die methode 
+	 * setPreciseTest() in Picture.
 	 * 
 	 * Nachdem barrier1 fertig ist werden die threads Column fortgesetzt und jede Spalte ruft communcate() auf jedem ihrer Knoten auf. Nach diesem Communicate-
 	 * Aufruf wartet jeder Threat auf barrier2.
@@ -232,7 +273,53 @@ public class Column implements Runnable{
 	 */
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
+		while(true){
+			for (int i = 0; i < barrierCount; i++){
+				startCalculate();
+				startFlow();						
+			}
+			
+			try{
+				barrier1.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				e.printStackTrace();
+				throw new IllegalArgumentException("barrier1 await fail!");
+			}
+			
+			startCommunicate();
+			
+			try{
+				barrier2.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				e.printStackTrace();
+				throw new IllegalArgumentException("barrier2 await fail!");
+			}
+			
+			// terminierung an dieser Stelle falls barrier2 globale konvergenz erkannt hat
+			if (terminated)
+				break;
+			
+			if (preciseTest){
+				startPreciseTest();
+				try {
+					barrier3.await();
+				} catch (InterruptedException | BrokenBarrierException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("barrier3 await fail!");
+				}
+			}	
+		}		
+	}
+
+	public boolean isPreciseTest() {
+		return preciseTest;
+	}
+
+	public void setPreciseTest(boolean preciseTest) {
+		this.preciseTest = preciseTest;
+	}
+	
+	public double getValueAtX(int x){
+		return nodeList.get(x).getValue();
 	}
 }

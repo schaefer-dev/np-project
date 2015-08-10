@@ -24,6 +24,7 @@ public class NPOsmose {
 			System.err.println("You must provide the serialized file as the first argument!");
 		}
 		GraphInfo ginfo = gson.fromJson(json, GraphInfo.class);
+		
 		// Your implementation can now access ginfo to read out all important values
 		ImageConvertible graph = null; // <--- you should implement ImageConvertible to write the graph out
 		ginfo.write2File("./result.txt", graph);

@@ -14,7 +14,7 @@ public class Picture implements ImageConvertible{
 	// height and width are already public inside GraphInfo
 	public final int height; 
 	public final int width;
-	private final ArrayList<Column> columnList;
+	private ArrayList<Column> columnList;
 	private int barriercount;
 	public final double epsilon;
 	public GraphInfo graph;
@@ -40,16 +40,54 @@ public class Picture implements ImageConvertible{
 		this.barriercount = barriercount;
 		this.epsilon = epsilon;
 		
-		this.columnList = null;
 		this.preciseTest = false;
 		
 		createBarrier1();
 		createBarrier2();
 		createBarrier3();
 		
-		//TODO columnList mit columns und nodes erstellen: this.columnList = new ArrayList<Column>();
-		//TODO am ende der NodeListenerstellung unbedingt daran denken den initialen node mit (x,y)=value hier zu setzen
-				
+		this.columnList = new ArrayList<Column>(width);
+		
+		// erstellen der Spalten
+		for (int i = 0; i < width; i++){
+			columnList.set(i, new Column(height, this, barrier1, barrier2, barrier3));
+		}
+		
+		// setzen der Nachbarn
+		columnList.get(0).setNeighbour(null, columnList.get(1));
+		columnList.get(width-1).setNeighbour(columnList.get(width-2), null);
+		for (int i = 1; i < width-1; i++){
+			columnList.get(i).setNeighbour(columnList.get(i-1), columnList.get(i+1));
+		}
+		
+		//setzen des initialen Nodes
+		columnList.get(x).createNewNode(x, y, value);
+					
+	}
+	
+	/*
+	 * diese Methode wird aufgerufen um alle unsere Threads zu erstellen, zu starten und anschliessend auf ihre terminierung zu warten
+	 */
+	public void runAllColumns(){
+		ArrayList<Thread> threadList = new ArrayList<Thread>(width);
+		
+		// erstellen unsere Threads
+		for (int i = 0; i < width; i++)
+			threadList.set(i, new Thread(columnList.get(i)));
+		
+		// starten alle Threads
+		for (int i = 0; i < width; i++)
+			threadList.get(i).start();
+		
+		// wartet hier bis alle Threads terminiert sind!
+		for (int i = 0; i < width; i++){
+			try {
+				threadList.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new IllegalArgumentException("joining our Thread failed!");
+			}
+		}
 	}
 	
 	private void createBarrier1(){

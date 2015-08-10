@@ -21,6 +21,7 @@ public class Picture implements ImageConvertible{
 	private CyclicBarrier barrier1;
     private CyclicBarrier barrier2;
     private CyclicBarrier barrier3;
+    public boolean preciseTest;
 	
 	
 	
@@ -40,6 +41,7 @@ public class Picture implements ImageConvertible{
 		this.epsilon = epsilon;
 		
 		this.columnList = null;
+		this.preciseTest = false;
 		
 		createBarrier1();
 		createBarrier2();
@@ -51,15 +53,58 @@ public class Picture implements ImageConvertible{
 	}
 	
 	private void createBarrier1(){
-		
+		barrier1 = new CyclicBarrier(width, new Runnable(){
+
+			@Override
+			public void run() {
+				if (!preciseTest){
+					for (int i = 0; i < width; i++){
+						if (!columnList.get(i).checkLocalTerminate()){
+							return;   	// we can return as soon as we find ONE column which does not fullfill our conditions
+										// for local termination
+						}
+							
+					}
+					setPreciseTest();	// we only get here when every column fullfills our conditon, so we can start
+										// our precise test
+				}
+				return;				
+			}});
 	}
 	
 	private void createBarrier2(){
-		
+		barrier2 = new CyclicBarrier(width, new Runnable(){
+
+			@Override
+			public void run() {
+				
+				if (!preciseTest){
+					return;
+				}
+				
+				for (int i = 0; i < width; i++){
+					if (!columnList.get(i).checkPreciseTest()){
+						return;   	// we can return as soon as we find ONE column which does not fullfill our conditions
+									// for precise termination
+					}
+						
+				}
+				terminateThreats();	// we only get here when every column fullfills our conditon, so we can terminate all threats			
+			}		
+		});
+
 	}
 
 	private void createBarrier3(){
-	
+		barrier3 = new CyclicBarrier(width, new Runnable(){
+
+			@Override
+			public void run() {
+				return; 	//ich synchronisiere nur!
+				
+			}
+			
+		});
 	}
 	
 	
@@ -90,6 +135,7 @@ public class Picture implements ImageConvertible{
 	 * is setting all preciseTest booleans=true (probably for all columns and barriers)
 	 */
 	public void setPreciseTest(){
+		preciseTest = true;
 		for (int i = 0; i < width; i++)
 			columnList.get(i).setPreciseTest(true);
 	}

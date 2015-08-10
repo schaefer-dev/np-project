@@ -197,7 +197,7 @@ public class Column implements Runnable{
 	/*
 	 * wir checken lokale Konvergenz indem wir fuer die Spalte testen ob inflow = outflow +- epsilon
 	 */
-	private boolean checkLocalTerminate(){
+	public boolean checkLocalTerminate(){
 		double leftOutflow = 0.0;
 		double rightOutflow = 0.0;
 		
@@ -250,6 +250,23 @@ public class Column implements Runnable{
 	}
 	
 	/*
+	 * wir checken ob alle nodes dieser column die eigenschaft unseres precisetest erfuellen!
+	 */
+	public boolean checkPreciseTest(){
+		double epsilon = matrix.epsilon;
+		double diffsum = 0.0;
+		int height = matrix.height;
+		
+		for (int i = 0; i < height; i++){
+			Node node = nodeList.get(i);
+			if (node != null)
+				diffsum += Math.abs(node.getValue()-node.getValue_old());
+		}
+		
+		return (diffsum <= epsilon);	
+	}
+	
+	/*
 	 * die Funktionalitaet einer Column iteriert grundsaetzlich immer barrierCount-mal.
 	 * 
 	 * im ersten Schritt wird fuer jeden enthaltenen Node zuerst einmal calculate() aufgerufen, anschliessend einmal flow() auf allen um den Ausstausch
@@ -294,6 +311,8 @@ public class Column implements Runnable{
 				e.printStackTrace();
 				throw new IllegalArgumentException("barrier2 await fail!");
 			}
+			
+			// NOTE: wir koennten den precisetest auch nebenlaeufig fuer alle spalten ausfuehren! Moeglicher Speedup
 			
 			// terminierung an dieser Stelle falls barrier2 globale konvergenz erkannt hat
 			if (terminated)

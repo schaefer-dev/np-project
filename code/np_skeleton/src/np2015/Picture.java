@@ -63,6 +63,8 @@ public class Picture implements ImageConvertible{
 		
 		//setzen des initialen Nodes
 		columnList.get(x).createNewNode(x, y, value);
+		
+		runAllColumns();
 					
 	}
 	
@@ -72,6 +74,9 @@ public class Picture implements ImageConvertible{
 	public void runAllColumns(){
 		ArrayList<Thread> threadList = new ArrayList<Thread>(width);
 		
+		for (int i = 0; i < width; i++)
+			threadList.add(null);
+		
 		// erstellen unsere Threads
 		for (int i = 0; i < width; i++)
 			threadList.set(i, new Thread(columnList.get(i)));
@@ -79,6 +84,8 @@ public class Picture implements ImageConvertible{
 		// starten alle Threads
 		for (int i = 0; i < width; i++)
 			threadList.get(i).start();
+		
+		System.out.println("all threads started!");
 		
 		// wartet hier bis alle Threads terminiert sind!
 		for (int i = 0; i < width; i++){
@@ -96,6 +103,7 @@ public class Picture implements ImageConvertible{
 
 			@Override
 			public void run() {
+				System.out.println("barrier1 reached");
 				if (!preciseTest){
 					for (int i = 0; i < width; i++){
 						if (!columnList.get(i).checkLocalTerminate()){
@@ -116,7 +124,7 @@ public class Picture implements ImageConvertible{
 
 			@Override
 			public void run() {
-				
+				System.out.println("barrier2 reached");
 				if (!preciseTest){
 					return;
 				}
@@ -135,10 +143,12 @@ public class Picture implements ImageConvertible{
 	}
 
 	private void createBarrier3(){
+		
 		barrier3 = new CyclicBarrier(width, new Runnable(){
 
 			@Override
 			public void run() {
+				System.out.println("barrier3!");
 				return; 	//ich synchronisiere nur!
 				
 			}

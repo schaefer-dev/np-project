@@ -23,11 +23,16 @@ public class Column implements Runnable{
 		this.size = size;
 		this.matrix = matrix;
 		this.nodeList = new ArrayList<Node>(size);	
+		
+		for (int i = 0; i < size; i++)
+			nodeList.add(null);
+		
 		this.preciseTest = false;
 		this.barrier1 = barrier1;
 		this.barrier2 = barrier2;
 		this.barrier3 = barrier3;
 		this.terminated = false;
+		this.barrierCount = matrix.getBarrierCount();
 		//TODO nodeList hier initialisieren mit der entsprechenden maimalen laenge
 	}
 	
@@ -117,6 +122,7 @@ public class Column implements Runnable{
 			}
 		}		
 		node.setFlowAkkuZero();	
+		
 	}
 	
 	/*
@@ -198,6 +204,8 @@ public class Column implements Runnable{
 	 * wir checken lokale Konvergenz indem wir fuer die Spalte testen ob inflow = outflow +- epsilon
 	 */
 	public boolean checkLocalTerminate(){
+		System.out.println("local check!");
+		
 		double leftOutflow = 0.0;
 		double rightOutflow = 0.0;
 		
@@ -227,8 +235,10 @@ public class Column implements Runnable{
 					leftInflow += node.getAkkuRight();
 				}
 			}
-			if (Math.abs(leftInflow - leftOutflow) >= matrix.epsilon)
+			
+			if (Math.abs(leftInflow - leftOutflow) >= matrix.epsilon){
 				return false;
+			}
 			leftKonvergenz = true;
 		}
 		
@@ -241,10 +251,20 @@ public class Column implements Runnable{
 					rightInflow += node.getAkkuLeft();
 				}
 			}
+			
+			//DEBUG:
+			if (leftColumn == null){
+				System.out.println("right inflow: " + rightInflow);
+				System.out.println("right Outflow: " + rightInflow);
+				System.out.println("Matrix.epsilon "+ matrix.epsilon);
+			}
+			//END DEBUG
+			
 			if (Math.abs(rightInflow - rightOutflow) >= matrix.epsilon)
 				return false;
 			leftKonvergenz = true;
 		}	
+	
 		
 		return (rightKonvergenz && leftKonvergenz);
 	}
@@ -301,6 +321,11 @@ public class Column implements Runnable{
 			} catch (InterruptedException | BrokenBarrierException e) {
 				e.printStackTrace();
 				throw new IllegalArgumentException("barrier1 await fail!");
+			}
+			
+			if (leftColumn == null){
+				double val = rightColumn.nodeList.get(1).getValue();
+				System.out.println("Node 1-1 Value: "+val);
 			}
 			
 			startCommunicate();

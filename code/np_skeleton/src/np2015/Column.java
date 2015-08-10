@@ -364,6 +364,9 @@ public class Column implements Runnable{
 	}
 	
 	public double getValueAtX(int x){
-		return nodeList.get(x).getValue();
+		Node node = nodeList.get(x);
+		if (node == null)
+			return 0.0;
+		return node.getValue();
 	}
 }

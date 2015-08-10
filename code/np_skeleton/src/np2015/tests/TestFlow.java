@@ -50,8 +50,6 @@ public class TestFlow {
 		double flowRateLeft = (node.getAkkuLeft()); // 0.0
 		double flowRateRight = (node.getAkkuRight()); // 1.192E-6
 		
-		System.out.println(flowRateRight);
-		
 		pic.columnList.get(1).flow(node);
 		
 		assertTrue(pic.getValueAt(2, 1) == 0.039735); // bottom Node ok
@@ -98,8 +96,6 @@ public class TestFlow {
 		double flowRateBottom = (node.getAkkuBottom()); //0.039735
 		double flowRateLeft = (node.getAkkuLeft()); // 0.0
 		double flowRateRight = (node.getAkkuRight()); // 1.192E-6
-		
-		System.out.println(flowRateRight);
 		
 		pic.columnList.get(1).flow(node);
 		

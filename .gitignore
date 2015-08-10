@@ -1,3 +1,7 @@
+# ignore the result file output
+code/np_skeleton/result.txt
+
+
 # doc pdf ignore
 doc/tex/doc.pdf
 

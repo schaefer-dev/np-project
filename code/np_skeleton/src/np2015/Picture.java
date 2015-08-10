@@ -50,7 +50,8 @@ public class Picture implements ImageConvertible{
 		
 		// erstellen der Spalten
 		for (int i = 0; i < width; i++){
-			columnList.set(i, new Column(height, this, barrier1, barrier2, barrier3));
+			columnList.add(new Column(height, this, barrier1, barrier2, barrier3));
+			//columnList.set(i, new Column(height, this, barrier1, barrier2, barrier3));
 		}
 		
 		// setzen der Nachbarn

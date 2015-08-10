@@ -26,7 +26,20 @@ public class NPOsmose {
 		GraphInfo ginfo = gson.fromJson(json, GraphInfo.class);
 		
 		// Your implementation can now access ginfo to read out all important values
-		ImageConvertible graph = null; // <--- you should implement ImageConvertible to write the graph out
+		
+		int width = ginfo.width;
+		int height = ginfo.height;
+		int barriercount = 10000;
+		double epsilon = ginfo.epsilon;
+		
+		//TODO wie lesen wir den initial node korrekt aus!
+		int x = 1;
+		int y = 1;
+		int value = 1;
+		
+		
+		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount); // <--- you should implement ImageConvertible to write the graph out
+		
 		ginfo.write2File("./result.txt", graph);
 	}
 

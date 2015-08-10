@@ -22,7 +22,7 @@ public class Column implements Runnable{
 	public Column(int size, Picture matrix, CyclicBarrier barrier1, CyclicBarrier barrier2, CyclicBarrier barrier3){
 		this.size = size;
 		this.matrix = matrix;
-		this.nodeList = new ArrayList<Node>(size);
+		this.nodeList = new ArrayList<Node>(size);	
 		this.preciseTest = false;
 		this.barrier1 = barrier1;
 		this.barrier2 = barrier2;

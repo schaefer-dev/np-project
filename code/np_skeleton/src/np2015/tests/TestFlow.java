@@ -1,10 +1,10 @@
-package np2015;
+package np2015.tests;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class TestCommunicate {
+public class TestFlow {
 
 	@Test
 	public void test() {

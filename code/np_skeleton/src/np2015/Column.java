@@ -97,20 +97,20 @@ public class Column implements Runnable{
 		int x = node.getX();
 		
 		if (akkuTop > 0.0){
-			if (y != matrix.height-1){
-				Node topNode = nodeList.get(y+1);
+			if (y != 0){
+				Node topNode = nodeList.get(y-1);
 				if (topNode == null)
-					createNewNode(x,y+1,akkuTop);
+					createNewNode(x,y-1,akkuTop);
 				else{
 					topNode.changeValue(akkuTop);
 				}
 			}		
 		}
 		if (akkuBottom > 0.0){
-			if (y != 0){
-				Node bottomNode = nodeList.get(y-1);
+			if (y != matrix.height-1){
+				Node bottomNode = nodeList.get(y+1);
 				if (bottomNode == null)
-					createNewNode(x,y-1,akkuBottom);
+					createNewNode(x,y+1,akkuBottom);
 				else{
 					bottomNode.changeValue(akkuBottom);
 				}

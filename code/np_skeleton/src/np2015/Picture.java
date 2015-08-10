@@ -14,7 +14,7 @@ public class Picture implements ImageConvertible{
 	// height and width are already public inside GraphInfo
 	public final int height; 
 	public final int width;
-	private ArrayList<Column> columnList;
+	public ArrayList<Column> columnList;
 	private int barriercount;
 	public final double epsilon;
 	public GraphInfo graph;

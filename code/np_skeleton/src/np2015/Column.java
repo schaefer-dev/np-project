@@ -9,7 +9,7 @@ import np2015.Node;
 public class Column implements Runnable{
 	private Column leftColumn;
 	private Column rightColumn;
-	private ArrayList<Node> nodeList;   // wir starten mit y = 0, x = 0 'oben links' in der matrix
+	public ArrayList<Node> nodeList;   // wir starten mit y = 0, x = 0 'oben links' in der matrix
 	private final int size;
 	private final Picture matrix;
 	private int barrierCount;

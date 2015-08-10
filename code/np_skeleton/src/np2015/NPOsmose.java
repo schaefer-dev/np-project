@@ -40,6 +40,7 @@ public class NPOsmose {
 		
 		
 		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount); // <--- you should implement ImageConvertible to write the graph out
+		graph.runAllColumns();
 		
 		ginfo.write2File("./result.txt", graph);
 	}

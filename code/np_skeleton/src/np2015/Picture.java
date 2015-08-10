@@ -63,8 +63,6 @@ public class Picture implements ImageConvertible{
 		
 		//setzen des initialen Nodes
 		columnList.get(x).createNewNode(x, y, value);
-		
-		runAllColumns();
 					
 	}
 	

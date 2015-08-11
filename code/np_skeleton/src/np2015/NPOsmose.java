@@ -29,21 +29,16 @@ public class NPOsmose {
 		
 		int width = ginfo.width;
 		int height = ginfo.height;
-		int barriercount = 1000;
+		int barriercount = 10000000;
 		double epsilon = ginfo.epsilon;
 		
-		//System.out.println(ginfo.column2row2initialValue.toString());
+		System.out.println(ginfo.column2row2initialValue.toString());
 		
-		//int x = ginfo.column2row2initialValue.keySet().iterator().next();
-		//int y = ginfo.column2row2initialValue.values().iterator()
+		int x = ginfo.column2row2initialValue.keySet().iterator().next();
+		int y = ginfo.column2row2initialValue.values().iterator().next().keySet().iterator().next();
+		double value = ginfo.column2row2initialValue.values().iterator().next().values().iterator().next();
 		
-		//System.out.println(ginfo.column2row2initialValue.keySet().hashCode());
-		//System.out.println(ginfo.column2row2initialValue.values().hashCode());
-		
-		//TODO wie lesen wir den initial node korrekt aus!
-		int x = 0;
-		int y = 0;
-		int value = 1;
+		System.out.println("x " + x+ " -- y "+y + " -- value: "+value);
 		
 		
 		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount); // <--- you should implement ImageConvertible to write the graph out

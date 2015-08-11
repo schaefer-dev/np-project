@@ -29,14 +29,13 @@ public class NPOsmose {
 		
 		int width = ginfo.width;
 		int height = ginfo.height;
-		int barriercount = 10000000;
+		int barriercount = 1000;
 		double epsilon = ginfo.epsilon;
 		
 		//TODO wie lesen wir den initial node korrekt aus!
-		int x = 1;
-		int y = 1;
+		int x = 0;
+		int y = 0;
 		int value = 1;
-		epsilon = 0.1;
 		
 		
 		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount); // <--- you should implement ImageConvertible to write the graph out

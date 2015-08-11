@@ -110,6 +110,7 @@ public class Picture implements ImageConvertible{
 						}
 							
 					}
+					System.out.println("preciseTestStart!!!");
 					setPreciseTest();	// we only get here when every column fullfills our conditon, so we can start
 										// our precise test
 				}

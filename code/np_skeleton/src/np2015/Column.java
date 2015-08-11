@@ -200,74 +200,66 @@ public class Column implements Runnable{
 		
 	}
 	
+	public double rightOutflow(){
+		double rightOutflow = 0.0;
+		
+		for (int i = 0; i < size; i++){
+			Node node = nodeList.get(i);
+			if (node != null)
+				rightOutflow += node.getAkkuRight();
+		}
+		
+		return rightOutflow;
+	}
+	
+	public double leftOutflow(){
+		double leftOutflow = 0.0;
+		
+		for (int i = 0; i < size; i++){
+			Node node = nodeList.get(i);
+			if (node != null)
+				leftOutflow += node.getAkkuLeft();
+		}
+		
+		return leftOutflow;
+	}
+	
+	
+	
 	/*
 	 * wir checken lokale Konvergenz indem wir fuer die Spalte testen ob inflow = outflow +- epsilon
 	 */
 	public boolean checkLocalTerminate(){
-		System.out.println("local check!");
-		
-		double leftOutflow = 0.0;
-		double rightOutflow = 0.0;
-		
-		double rightInflow = 0.0;
-		double leftInflow = 0.0;
 		
 		boolean rightKonvergenz = false;
 		boolean leftKonvergenz = false;
-		
-		int height = matrix.height;
-		
-		
-		for (int i = 0; i < height; i++){
-			Node node = nodeList.get(i);
-			if (node != null){
-				leftOutflow += node.getAkkuLeft();
-				rightOutflow += node.getAkkuRight();
-			}
-		}
-		
-		if (leftColumn == null)
-			leftKonvergenz = true;
-		else{
-			for (int i = 0; i < height; i++){
-				Node node = leftColumn.nodeList.get(i);
-				if (node != null){
-					leftInflow += node.getAkkuRight();
-				}
-			}
-			
-			if (Math.abs(leftInflow - leftOutflow) >= matrix.epsilon){
-				return false;
-			}
-			leftKonvergenz = true;
-		}
-		
-		if (rightColumn == null)
-			rightKonvergenz = true;
-		else{
-			for (int i = 0; i < height; i++){
-				Node node = rightColumn.nodeList.get(i);
-				if (node != null){
-					rightInflow += node.getAkkuLeft();
-				}
-			}
-			
-			//DEBUG:
-			if (leftColumn == null){
-				System.out.println("right inflow: " + rightInflow);
-				System.out.println("right Outflow: " + rightInflow);
-				System.out.println("Matrix.epsilon "+ matrix.epsilon);
-			}
-			//END DEBUG
-			
-			if (Math.abs(rightInflow - rightOutflow) >= matrix.epsilon)
-				return false;
-			leftKonvergenz = true;
-		}	
 	
+		if (leftColumn != null){
+			if (Math.abs(leftColumn.rightOutflow() - this.leftOutflow()) <= matrix.epsilon)
+				leftKonvergenz = true;
+		}else{
+			leftKonvergenz = true;
+		}
 		
-		return (rightKonvergenz && leftKonvergenz);
+		if (!leftKonvergenz){
+			//debug
+			System.out.println("local check! left "+ leftKonvergenz);
+			//debugend
+			return false;
+		}
+		
+		if (rightColumn != null){
+			if (Math.abs(rightColumn.leftOutflow() - this.rightOutflow()) <= matrix.epsilon)
+				rightKonvergenz = true;
+		}else{
+			rightKonvergenz = true;
+		}
+		//debug
+		System.out.println("local check! right "+ rightKonvergenz);
+		//debugend
+		return rightKonvergenz;
 	}
+	
 	
 	/*
 	 * wir checken ob alle nodes dieser column die eigenschaft unseres precisetest erfuellen!
@@ -311,47 +303,86 @@ public class Column implements Runnable{
 	@Override
 	public void run() {
 		while(true){
-			for (int i = 0; i < barrierCount; i++){
-				startCalculate();
-				startFlow();						
-			}
-			
-			try{
-				barrier1.await();
-			} catch (InterruptedException | BrokenBarrierException e) {
-				e.printStackTrace();
-				throw new IllegalArgumentException("barrier1 await fail!");
-			}
-			
-			if (leftColumn == null){
-				double val = rightColumn.nodeList.get(1).getValue();
-				System.out.println("Node 1-1 Value: "+val);
-			}
-			
-			startCommunicate();
-			
-			try{
-				barrier2.await();
-			} catch (InterruptedException | BrokenBarrierException e) {
-				e.printStackTrace();
-				throw new IllegalArgumentException("barrier2 await fail!");
-			}
-			
-			// NOTE: wir koennten den precisetest auch nebenlaeufig fuer alle spalten ausfuehren! Moeglicher Speedup
-			
-			// terminierung an dieser Stelle falls barrier2 globale konvergenz erkannt hat
-			if (terminated)
-				break;
-			
-			if (preciseTest){
-				startPreciseTest();
-				try {
-					barrier3.await();
+			if (!preciseTest){
+				for (int i = 0; i < barrierCount; i++){
+					startCalculate();
+					startFlow();						
+				}
+				
+				try{
+					barrier1.await();
 				} catch (InterruptedException | BrokenBarrierException e) {
 					e.printStackTrace();
-					throw new IllegalArgumentException("barrier3 await fail!");
+					throw new IllegalArgumentException("barrier1 await fail!");
 				}
-			}	
+				
+				startCommunicate();
+				
+				try{
+					barrier2.await();
+				} catch (InterruptedException | BrokenBarrierException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("barrier2 await fail!");
+				}
+				
+				// NOTE: wir koennten den precisetest auch nebenlaeufig fuer alle spalten ausfuehren! Moeglicher Speedup
+				
+				// terminierung an dieser Stelle falls barrier2 globale konvergenz erkannt hat
+				if (terminated)
+					break;
+				
+				if (preciseTest){
+					startPreciseTest();
+					try {
+						barrier3.await();
+					} catch (InterruptedException | BrokenBarrierException e) {
+						e.printStackTrace();
+						throw new IllegalArgumentException("barrier3 await fail!");
+					}
+				}
+			}else{
+				for (int i = 0; i < (barrierCount/100); i++){
+					startCalculate();
+					startFlow();						
+				}
+				
+				try{
+					barrier1.await();
+				} catch (InterruptedException | BrokenBarrierException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("barrier1 await fail!");
+				}
+				
+				if (leftColumn == null){
+					double val = rightColumn.nodeList.get(1).getValue();
+					System.out.println("Node 1-1 Value: "+val);
+				}
+				
+				startCommunicate();
+				
+				try{
+					barrier2.await();
+				} catch (InterruptedException | BrokenBarrierException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("barrier2 await fail!");
+				}
+				
+				// NOTE: wir koennten den precisetest auch nebenlaeufig fuer alle spalten ausfuehren! Moeglicher Speedup
+				
+				// terminierung an dieser Stelle falls barrier2 globale konvergenz erkannt hat
+				if (terminated)
+					break;
+				
+				if (preciseTest){
+					startPreciseTest();
+					try {
+						barrier3.await();
+					} catch (InterruptedException | BrokenBarrierException e) {
+						e.printStackTrace();
+						throw new IllegalArgumentException("barrier3 await fail!");
+					}
+				}
+			}
 		}		
 	}
 

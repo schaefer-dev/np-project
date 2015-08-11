@@ -243,7 +243,7 @@ public class Column implements Runnable{
 		
 		if (!leftKonvergenz){
 			//debug
-			System.out.println("local check! left "+ leftKonvergenz);
+			//System.out.println("local check! left "+ leftKonvergenz);
 			//debugend
 			return false;
 		}
@@ -255,7 +255,7 @@ public class Column implements Runnable{
 			rightKonvergenz = true;
 		}
 		//debug
-		System.out.println("local check! right "+ rightKonvergenz);
+		//System.out.println("local check! right "+ rightKonvergenz);
 		//debugend
 		return rightKonvergenz;
 	}
@@ -353,10 +353,6 @@ public class Column implements Runnable{
 					throw new IllegalArgumentException("barrier1 await fail!");
 				}
 				
-				if (leftColumn == null){
-					double val = rightColumn.nodeList.get(1).getValue();
-					System.out.println("Node 1-1 Value: "+val);
-				}
 				
 				startCommunicate();
 				

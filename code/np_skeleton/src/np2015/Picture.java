@@ -101,7 +101,7 @@ public class Picture implements ImageConvertible{
 
 			@Override
 			public void run() {
-				System.out.println("barrier1 reached");
+				//System.out.println("barrier1 reached");
 				if (!preciseTest){
 					for (int i = 0; i < width; i++){
 						if (!columnList.get(i).checkLocalTerminate()){
@@ -123,7 +123,7 @@ public class Picture implements ImageConvertible{
 
 			@Override
 			public void run() {
-				System.out.println("barrier2 reached");
+				//System.out.println("barrier2 reached");
 				if (!preciseTest){
 					return;
 				}

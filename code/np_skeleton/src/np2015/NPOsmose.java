@@ -32,6 +32,14 @@ public class NPOsmose {
 		int barriercount = 1000;
 		double epsilon = ginfo.epsilon;
 		
+		//System.out.println(ginfo.column2row2initialValue.toString());
+		
+		//int x = ginfo.column2row2initialValue.keySet().iterator().next();
+		//int y = ginfo.column2row2initialValue.values().iterator()
+		
+		//System.out.println(ginfo.column2row2initialValue.keySet().hashCode());
+		//System.out.println(ginfo.column2row2initialValue.values().hashCode());
+		
 		//TODO wie lesen wir den initial node korrekt aus!
 		int x = 0;
 		int y = 0;

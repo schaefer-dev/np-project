@@ -2,6 +2,7 @@ package np2015;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -15,17 +16,21 @@ public class Column implements Runnable {
 	private int barrierCount;
 	private boolean preciseTest;
 	private CyclicBarrier barrier1;
+	private CyclicBarrier barrier15;
 	private CyclicBarrier barrier2;
 	private CyclicBarrier barrier3;
+	private LinkedList<Node> insertQueue;
 	private boolean terminated;
 
 	public Column(int size, Picture matrix, CyclicBarrier barrier1,
-			CyclicBarrier barrier2, CyclicBarrier barrier3) {
+			CyclicBarrier barrier2, CyclicBarrier barrier3, CyclicBarrier barrier15) {
 		this.size = size;
 		this.matrix = matrix;
 		this.nodeMap = new HashMap<>();
+		this.insertQueue = new LinkedList<Node>();
 		this.preciseTest = false;
 		this.barrier1 = barrier1;
+		this.barrier15 = barrier15;
 		this.barrier2 = barrier2;
 		this.barrier3 = barrier3;
 		this.terminated = false;
@@ -41,6 +46,13 @@ public class Column implements Runnable {
 
 	public void terminate() {
 		terminated = true;
+	}
+	
+	public void insertEverythingFromQueue(){
+		for (Node node : insertQueue) {
+			nodeMap.put(node.getY(), node);
+		}
+		insertQueue.clear();
 	}
 
 	/*
@@ -136,6 +148,32 @@ public class Column implements Runnable {
 	 * der erstellte knoten wird in die nodelist hinzugefuegt
 	 */
 	public synchronized void createNewNode(int x, int y, double value) {
+		
+		for (Node node : insertQueue){
+			if (node.getY() ==  y){
+				node.changeValue(value);
+				return;
+			}
+		}
+		
+		double rateTop = matrix.graph.getRateForTarget(x, y, Neighbor.Top);
+		double rateBottom = matrix.graph.getRateForTarget(x, y,
+				Neighbor.Bottom);
+		double rateLeft = matrix.graph
+				.getRateForTarget(x, y, Neighbor.Left);
+		double rateRight = matrix.graph.getRateForTarget(x, y,
+				Neighbor.Right);
+		Node node = new Node(this, x, y, value, rateTop, rateBottom,
+				rateLeft, rateRight);
+		
+		insertQueue.add(node);
+	}
+	
+	
+	/*
+	 * hinzufuegen des initialen nodes
+	 */
+	public synchronized void createInitialNode(int x, int y, double value) {
 		if (nodeMap.get(y) == null) {
 			double rateTop = matrix.graph.getRateForTarget(x, y, Neighbor.Top);
 			double rateBottom = matrix.graph.getRateForTarget(x, y,
@@ -243,7 +281,7 @@ public class Column implements Runnable {
 
 		if (!leftKonvergenz) {
 			// debug
-			System.out.println("local check! left " + leftKonvergenz);
+			//System.out.println("local check! left " + leftKonvergenz);
 			// debugend
 			return false;
 		}
@@ -255,7 +293,8 @@ public class Column implements Runnable {
 			rightKonvergenz = true;
 		}
 		// debug
-		System.out.println("local check! right " + rightKonvergenz);
+		//if (rightKonvergenz)
+			//System.out.println("local check! right " + rightKonvergenz);
 		// debugend
 		return rightKonvergenz;
 	}
@@ -308,6 +347,10 @@ public class Column implements Runnable {
 	 * allen value_old geschieht Falls precisetest = false war wird direkt
 	 * this.run aufgerufen und kein warten auf barrier3 notwendig.
 	 * 
+	 * Nachtrag:
+	 * barrier15 sorgt dafuer das neue knoten in jeder column erst dann eingefuegt
+	 * werden wenn jede spalte fertig communicated hat
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
@@ -317,6 +360,7 @@ public class Column implements Runnable {
 				for (int i = 0; i < barrierCount; i++) {
 					startCalculate();
 					startFlow();
+					insertEverythingFromQueue();
 				}
 
 				try {
@@ -327,6 +371,15 @@ public class Column implements Runnable {
 				}
 
 				startCommunicate();
+				
+				try {
+					barrier15.await();
+				} catch (InterruptedException | BrokenBarrierException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("barrier1 await fail!");
+				}
+				
+				insertEverythingFromQueue();
 
 				try {
 					barrier2.await();
@@ -364,11 +417,6 @@ public class Column implements Runnable {
 				} catch (InterruptedException | BrokenBarrierException e) {
 					e.printStackTrace();
 					throw new IllegalArgumentException("barrier1 await fail!");
-				}
-
-				if (leftColumn == null) {
-					double val = rightColumn.nodeMap.get(1).getValue();
-					System.out.println("Node 1-1 Value: " + val);
 				}
 
 				startCommunicate();

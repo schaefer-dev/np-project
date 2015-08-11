@@ -29,7 +29,7 @@ public class NPOsmose {
 		
 		int width = ginfo.width;
 		int height = ginfo.height;
-		int barriercount = 10000000;
+		int barriercount = 100000;
 		double epsilon = ginfo.epsilon;
 		
 		System.out.println(ginfo.column2row2initialValue.toString());

@@ -19,6 +19,7 @@ public class Picture implements ImageConvertible{
 	public final double epsilon;
 	public GraphInfo graph;
 	private CyclicBarrier barrier1;
+	private CyclicBarrier barrier15;
     private CyclicBarrier barrier2;
     private CyclicBarrier barrier3;
     public boolean preciseTest;
@@ -43,6 +44,7 @@ public class Picture implements ImageConvertible{
 		this.preciseTest = false;
 		
 		createBarrier1();
+		createBarrier15();
 		createBarrier2();
 		createBarrier3();
 		
@@ -50,7 +52,7 @@ public class Picture implements ImageConvertible{
 		
 		// erstellen der Spalten
 		for (int i = 0; i < width; i++){
-			columnList.add(new Column(height, this, barrier1, barrier2, barrier3));
+			columnList.add(new Column(height, this, barrier1, barrier2, barrier3, barrier15));
 			//columnList.set(i, new Column(height, this, barrier1, barrier2, barrier3));
 		}
 		
@@ -62,7 +64,7 @@ public class Picture implements ImageConvertible{
 		}
 		
 		//setzen des initialen Nodes
-		columnList.get(x).createNewNode(x, y, value);
+		columnList.get(x).createInitialNode(x, y, value);
 					
 	}
 	
@@ -101,7 +103,7 @@ public class Picture implements ImageConvertible{
 
 			@Override
 			public void run() {
-				System.out.println("barrier1 reached");
+				//System.out.println("barrier1 reached");
 				if (!preciseTest){
 					for (int i = 0; i < width; i++){
 						if (!columnList.get(i).checkLocalTerminate()){
@@ -118,12 +120,21 @@ public class Picture implements ImageConvertible{
 			}});
 	}
 	
+	private void createBarrier15(){
+		barrier15 = new CyclicBarrier(width, new Runnable(){
+
+			@Override
+			public void run() {
+						
+			}});
+	}
+	
 	private void createBarrier2(){
 		barrier2 = new CyclicBarrier(width, new Runnable(){
 
 			@Override
 			public void run() {
-				System.out.println("barrier2 reached");
+				//System.out.println("barrier2 reached");
 				if (!preciseTest){
 					return;
 				}
@@ -147,7 +158,7 @@ public class Picture implements ImageConvertible{
 
 			@Override
 			public void run() {
-				System.out.println("barrier3!");
+				//System.out.println("barrier3!");
 				return; 	//ich synchronisiere nur!
 				
 			}

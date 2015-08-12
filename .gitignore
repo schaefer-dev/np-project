@@ -1,6 +1,9 @@
 # ignore the result file output
 code/np_skeleton/result.txt
 
+# ignore the output files of our observer
+code/np_skeleton/testresult* 
+
 
 # doc pdf ignore
 doc/tex/doc.pdf

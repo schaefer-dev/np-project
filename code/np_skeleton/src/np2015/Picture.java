@@ -138,7 +138,7 @@ public class Picture implements ImageConvertible{
 			
 			@Override
 			public void run() {
-				if ((counter % 100) == 0){
+				if ((counter % 10) == 0){
 					graph.write2File("./testresult"+namecounter+".txt", pic);
 					System.out.println("new testresult"+namecounter+".txt printed!");
 					counter++;
@@ -200,7 +200,7 @@ public class Picture implements ImageConvertible{
 	 * returns the value of the node at position (x,y)
 	 */
 	public double getValueAt(int row, int column){
-		return columnList.get(column).getValueAtX(row);
+		return columnList.get(column).getValueAtY(row);
 	}
 	
 	/*

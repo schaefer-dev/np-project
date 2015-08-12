@@ -458,8 +458,8 @@ public class Column implements Runnable {
 		this.preciseTest = preciseTest;
 	}
 
-	public double getValueAtX(int x) {
-		Node node = nodeMap.get(x);
+	public double getValueAtY(int y) {
+		Node node = nodeMap.get(y);
 		if (node == null)
 			return 0.0;
 		return node.getValue();

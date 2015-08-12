@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Observer;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
@@ -42,6 +44,33 @@ public class NPOsmose {
 		
 		
 		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount); // <--- you should implement ImageConvertible to write the graph out
+		
+		/////////////////////////OBSERVER/////////////////////
+		
+		Thread obs = new Thread(new Runnable() { public void run() { 
+				int counter = 0;
+				while(true)	{
+					try {
+						System.in.read();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					ginfo.write2File("./testresult"+counter+".txt", graph);
+					System.out.println("new testresult"+counter+".txt printed!");
+					counter++;
+				}
+				
+			}});
+		
+		obs.start();
+		
+		
+		
+		
+		/////////////////////OBSERVEREND///////////////////////
+		
+
 		graph.runAllColumns();
 		
 		ginfo.write2File("./result.txt", graph);

@@ -26,7 +26,7 @@ public class Column implements Runnable {
 			CyclicBarrier barrier2, CyclicBarrier barrier3, CyclicBarrier barrier15) {
 		this.size = size;
 		this.matrix = matrix;
-		this.nodeMap = new HashMap<>();
+		this.nodeMap = new HashMap<>(size);
 		this.insertQueue = new LinkedList<Node>();
 		this.preciseTest = false;
 		this.barrier1 = barrier1;

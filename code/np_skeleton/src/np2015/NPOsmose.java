@@ -31,8 +31,9 @@ public class NPOsmose {
 		
 		int width = ginfo.width;
 		int height = ginfo.height;
-		int barriercount = 100000;
+		int barriercount = 10000;
 		double epsilon = ginfo.epsilon;
+		//double epsilon = 500000000;
 		
 		System.out.println(ginfo.column2row2initialValue.toString());
 		
@@ -48,22 +49,22 @@ public class NPOsmose {
 		/////////////////////////OBSERVER/////////////////////
 		
 		Thread obs = new Thread(new Runnable() { public void run() { 
-				int counter = 0;
-				while(true)	{
-					try {
-						System.in.read();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					ginfo.write2File("./testresult"+counter+".txt", graph);
-					System.out.println("new testresult"+counter+".txt printed!");
-					counter++;
+			int counter = 0;
+			while(true)	{
+				try {
+					System.in.read();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
-			}});
+				ginfo.write2File("./testresult"+counter+".txt", graph);
+				System.out.println("new testresult"+counter+".txt printed!");
+				counter++;
+			}
+			
+		}});
 		
-		obs.start();
+		//obs.start();
 		
 		
 		
@@ -72,6 +73,7 @@ public class NPOsmose {
 		
 
 		graph.runAllColumns();
+		
 		
 		ginfo.write2File("./result.txt", graph);
 	}

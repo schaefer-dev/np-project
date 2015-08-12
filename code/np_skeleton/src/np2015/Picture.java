@@ -3,6 +3,7 @@
  */
 package np2015;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.CyclicBarrier;
 
@@ -22,6 +23,7 @@ public class Picture implements ImageConvertible{
 	private CyclicBarrier barrier15;
     private CyclicBarrier barrier2;
     private CyclicBarrier barrier3;
+    private Picture pic = this;    // DEBUG for observer
     public boolean preciseTest;
 	
 	
@@ -131,9 +133,20 @@ public class Picture implements ImageConvertible{
 	
 	private void createBarrier2(){
 		barrier2 = new CyclicBarrier(width, new Runnable(){
-
+			int counter = 0; //DEBUG OBSERVER
+			int namecounter = 0; //DEBUG OBSERVER
+			
 			@Override
 			public void run() {
+				if ((counter % 100) == 0){
+					graph.write2File("./testresult"+namecounter+".txt", pic);
+					System.out.println("new testresult"+namecounter+".txt printed!");
+					counter++;
+					namecounter++;
+				}
+				counter++;
+				
+				
 				//System.out.println("barrier2 reached");
 				if (!preciseTest){
 					return;

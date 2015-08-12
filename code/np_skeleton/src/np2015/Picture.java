@@ -199,7 +199,7 @@ public class Picture implements ImageConvertible{
 	/*
 	 * returns the value of the node at position (x,y)
 	 */
-	public double getValueAt(int row, int column){
+	public double getValueAt(int column, int row){
 		return columnList.get(column).getValueAtY(row);
 	}
 	

@@ -14,9 +14,17 @@ public class Node {
 	private double akkuBottom;
 	private double akkuLeft;
 	private double akkuRight;
-	private Column myColumn;
 	
-	public Node(Column myColumn, int x, int y, double value,double rateTop, double rateBottom, double rateLeft, double rateRight){
+	/**
+	 * @param x x-coordinate of this node
+	 * @param y y-coordinate of this node
+	 * @param value (initial) value of this node
+	 * @param rateTop topRate of this node
+	 * @param rateBottom bottomrate of this node
+	 * @param rateLeft leftrate of this node
+	 * @param rateRight rightrate of this node
+	 */
+	public Node(int x, int y, double value,double rateTop, double rateBottom, double rateLeft, double rateRight){
 		this.x = x;
 		this.y = y;
 		this.value = value;
@@ -30,7 +38,7 @@ public class Node {
 	
 	
 	/*
-	 * berechnet die Werte aller seiner akkumulatoren mit Hilfe von value und flowrates
+	 * calculates the akkus depending on value/flowrates of this node
 	 */
 	public void calculate(){
 		akkuTop = value * rateTop;
@@ -43,17 +51,10 @@ public class Node {
 	}
 	
 	/*
-	 * synchronisierter 'Setter' fuer value. 
+	 * synchronized change for the value of this nodes (no change is lost!)
 	 */
 	public synchronized void changeValue(double Akku){
 		value += Akku;
-	}
-
-	/* 
-	 * returnt den Unterschied zwischen value und value_old
-	 */
-	public double checkKonvergenz(){
-		return Math.abs(value_old - value);
 	}
 
 
@@ -84,11 +85,18 @@ public class Node {
 		return y;
 	}
 
+	
+	/**
+	 * reset akku top and akku bottom to 0
+	 */
 	public void setFlowAkkuZero(){
 		akkuTop = 0;
 		akkuBottom = 0;
 	}
 	
+	/**
+	 * reset akku left and akku right to 0
+	 */
 	public void setCommunicateAkkuZero(){
 		akkuLeft = 0;
 		akkuRight = 0;

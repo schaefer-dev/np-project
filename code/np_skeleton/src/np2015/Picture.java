@@ -28,14 +28,16 @@ public class Picture implements ImageConvertible{
     public int testresultcounter;
 	
 	
-	
-	/*
-	 * @param x: x-Koordinate des gesetzen initialen Osmose-Nodes
-	 * @param y: y-Koordinate des gesetzt initialen Osmose-Nodes
-	 * @param value: value des initial gesetzen Osmods-Nodes
-	 * 
-	 * Im Konstruktor erstellen wir bereits alle benoetigten Spalten und Nodes die fuer das 'momentane' Bild relevant sind.
-	 * 
+	/**
+	 * @param graph the graph in which this matrix in contained
+	 * @param width the width of the picture
+	 * @param height the height of the picture
+	 * @param x the x coordinate of the initial node
+	 * @param y the y coordinate of the initial node
+	 * @param value the value of the initial node
+	 * @param epsilon the epsilon
+	 * @param barriercount the barriercount (potentially chosen by user)
+	 * @param testresultcounter the testresultcounter (potentially chosen by user)
 	 */
 	public Picture(GraphInfo graph, int width, int height, int x, int y, double value, double epsilon, int barriercount, int testresultcounter){
 		this.graph = graph;
@@ -72,8 +74,10 @@ public class Picture implements ImageConvertible{
 					
 	}
 	
-	/*
-	 * diese Methode wird aufgerufen um alle unsere Threads zu erstellen, zu starten und anschliessend auf ihre terminierung zu warten
+	
+	/**
+	 * this method starts every column as a Thread and waits for them to finish their work
+	 * to terminate.
 	 */
 	public void runAllColumns(){
 		ArrayList<Thread> threadList = new ArrayList<Thread>(width);
@@ -102,12 +106,16 @@ public class Picture implements ImageConvertible{
 		}
 	}
 	
+	/**
+	 * creates Barrier1 which checks for local convergence if precisetest was 
+	 * not started yet. If barrier1 sees local convergence in every column
+	 * we set the precisetset var in every column by calling setPreciseTest()
+	 */
 	private void createBarrier1(){
 		barrier1 = new CyclicBarrier(width, new Runnable(){
 
 			@Override
 			public void run() {
-				//System.out.println("barrier1 reached");
 				if (!preciseTest){
 					for (int i = 0; i < width; i++){
 						if (!columnList.get(i).checkLocalTerminate()){
@@ -124,6 +132,9 @@ public class Picture implements ImageConvertible{
 			}});
 	}
 	
+	/**
+	 * Creates Barrier15 which just serves for synchronisation (see run method in column)
+	 */
 	private void createBarrier15(){
 		barrier15 = new CyclicBarrier(width, new Runnable(){
 
@@ -133,10 +144,16 @@ public class Picture implements ImageConvertible{
 			}});
 	}
 	
+	/**
+	 * Creates Barrier2 which produces testresults depending on testresultcounter set by the user
+	 * Barrier2 also does the precisetest using the second euklid. norm on the whole matrix and compares
+	 * to epsilon. If barrier2 notices global convergence barrier2 calls terminateThreats() which tells
+	 * every thread to terminate. 
+	 */
 	private void createBarrier2(){
 		barrier2 = new CyclicBarrier(width, new Runnable(){
-			int counter = 0; //DEBUG OBSERVER
-			int namecounter = 0; //DEBUG OBSERVER
+			int counter = 0; //OBSERVER
+			int namecounter = 0; //OBSERVER
 			
 			@Override
 			public void run() {
@@ -156,6 +173,7 @@ public class Picture implements ImageConvertible{
 				if (!preciseTest){
 					return;
 				}
+				
 				double epsilon2  = epsilon * epsilon;
 				double diffsums = 0.0;
 				
@@ -167,12 +185,15 @@ public class Picture implements ImageConvertible{
 					}
 						
 				}
-				terminateThreats();	// we only get here when every column fullfills our conditon, so we can terminate all threats			
+				terminateThreats();	// we only get here when we fullfill the entire convergence-conditon, so we can terminate all threats			
 			}		
 		});
 
 	}
 
+	/**
+	 * Creates Barrier3 which just serves for synchronisation (see run method in column)
+	 */
 	private void createBarrier3(){
 		
 		barrier3 = new CyclicBarrier(width, new Runnable(){
@@ -188,8 +209,10 @@ public class Picture implements ImageConvertible{
 	}
 	
 	
-	/*
-	 * wir iterieren ueber columnList und halten jeden Threat an! Wichtig ist dass wir daran denken in jedem threat den interrupted flag zu beachten
+
+	/**
+	 * we iterate over every Column in the picture and call terminate() to set the terminate var in the column true
+	 * The column will terminate fairly soon
 	 */
 	public void terminateThreats(){
 		for (int i = 0; i < width; i++)
@@ -204,15 +227,18 @@ public class Picture implements ImageConvertible{
 		return this.barriercount;
 	}
 	
-	/*
-	 * returns the value of the node at position (x,y)
+
+	/**
+	 * @param column the column of the desired value
+	 * @param row the row of the desired value
+	 * @return the value of the node at position (column,row)
 	 */
 	public double getValueAt(int column, int row){
 		return columnList.get(column).getValueAtY(row);
 	}
 	
 	/*
-	 * is setting all preciseTest booleans=true (probably for all columns and barriers)
+	 * is setting preciseTest=true in every column contained in this picture
 	 */
 	public void setPreciseTest(){
 		preciseTest = true;

@@ -9,8 +9,7 @@ import java.util.concurrent.CyclicBarrier;
 public class Column implements Runnable {
 	private Column leftColumn;
 	private Column rightColumn;
-	public HashMap<Integer, Node> nodeMap; // wir starten mit y = 0, x = 0 'oben
-											// links' in der matrix
+	public HashMap<Integer, Node> nodeMap; // we start with (0,0) in the top left corner
 	private final int size;
 	private final Picture matrix;
 	private int barrierCount;
@@ -22,6 +21,16 @@ public class Column implements Runnable {
 	private LinkedList<Node> insertQueue;
 	private boolean terminated;
 
+	/**
+	 * Column implements Runnable to serve as a thread
+	 * 
+	 * @param size size of the column (height of the matrix)
+	 * @param matrix Matrix in which the column is placed
+	 * @param barrier1 @see barrier1
+	 * @param barrier2 @see barrier2
+	 * @param barrier3 @see barrier3
+	 * @param barrier15 @see barrier15
+	 */
 	public Column(int size, Picture matrix, CyclicBarrier barrier1,
 			CyclicBarrier barrier2, CyclicBarrier barrier3, CyclicBarrier barrier15) {
 		this.size = size;
@@ -35,19 +44,27 @@ public class Column implements Runnable {
 		this.barrier3 = barrier3;
 		this.terminated = false;
 		this.barrierCount = matrix.getBarrierCount();
-		// TODO nodeList hier initialisieren mit der entsprechenden maimalen
-		// laenge
 	}
-
+	
+	/**
+	 * @param left Left Neighbour column
+	 * @param right Right Neighbour column
+	 */
 	public void setNeighbour(Column left, Column right) {
 		this.leftColumn = left;
 		this.rightColumn = right;
 	}
 
+	/**
+	 * set terminated var true
+	 */
 	public void terminate() {
 		terminated = true;
 	}
 	
+	/**
+	 * Function to add all new nodes which were created during flow/communicate into the node hashmap
+	 */
 	public void insertEverythingFromQueue(){
 		for (Node node : insertQueue) {
 			nodeMap.put(node.getY(), node);
@@ -55,16 +72,14 @@ public class Column implements Runnable {
 		insertQueue.clear();
 	}
 
-	/*
-	 * Communicate schiebt die Akkumulatoren aus this auf die Knoden right und
-	 * left. Dazu wird in left bzw right die Methode changeValue aufgerufen. Am
-	 * ende Nullen wir die uebertragenen Akkumulatoren.
+
+	/**
+	 * Communicate will move the akkus to the node on the right and on the left
+	 * If one of this nodes does not exist we call the createNewNode method with
+	 * the given values
 	 * 
-	 * wichtiger Sonderfall wenn wir hier als nachbarnode right einen noch nicht
-	 * existierenden node erhalten koennen wir an dieser stelle direkt einen
-	 * neuen Node erstellen und dann right=newNode ... setzen mit
-	 * enstsprechenden Koordinaten und value. Wir muessen uns vorher noch die
-	 * rates des Knotens besorgen!
+	 * @param node the Node from which we communicate to 'neighbour-nodes' on the right and left
+	 * 
 	 */
 	public void communicate(Node node) {
 		if (node == null)
@@ -75,8 +90,7 @@ public class Column implements Runnable {
 		int x = node.getX();
 		int y = node.getY();
 
-		if (akkuLeft > 0.0) { // Not neccesary if flowrates at corners are 0!
-								// Better safe than sorry
+		if (akkuLeft > 0.0) {
 			if (x != 0) {
 				Node leftNode = leftColumn.nodeMap.get(y);
 				if (leftNode == null)
@@ -88,7 +102,7 @@ public class Column implements Runnable {
 		}
 
 		if (akkuRight > 0.0) {
-			if (x != matrix.width - 1) { // /TODO
+			if (x != matrix.width - 1) { 
 				Node rightNode = rightColumn.nodeMap.get(y);
 				if (rightNode == null)
 					rightColumn.createNewNode(x + 1, y, akkuRight);
@@ -100,8 +114,14 @@ public class Column implements Runnable {
 		node.setCommunicateAkkuZero();
 	}
 
-	/*
-	 * siehe communicate() aber in der Vertikalen
+
+	/**
+	 * Communicate will move the akkus to the node on top and on bottom
+	 * If one of this nodes does not exist we call the createNewNode method with
+	 * the given values
+	 * 
+	 * @param node the Node from which we communicate to 'neighbour-nodes' on top and bottom
+	 * 
 	 */
 	public void flow(Node node) {
 		if (node == null)
@@ -136,16 +156,15 @@ public class Column implements Runnable {
 
 	}
 
-	/*
-	 * wir erstellen einen neuen Node in this, da von beiden benachbarten
-	 * spalten ein aufruf dieser methode potentiell gleichzeitig passieren
-	 * koennte muss die methode synchronized sein! Zu beginn der Methode muessen
-	 * wir trotzdem ueberpruefen ob der Node nicht doch gerade erst erstellt
-	 * wurde. In diesem Fall wuerden wiir einfach value auf die value des nodes
-	 * addieren. Falls der knoten noch nicht 'da ist' erstellen wir einen neuen
-	 * und hohlen uns wie gehabt aus guarded commands die flowrate usw.
+	/**
+	 * we create a new node in this Column. We protected this method with sychronized
+	 * to avoid dataraces when this method is called twice on the same column with
+	 * potentially the same node to create. We avoid creating nodes twice entirely
+	 * but every value is added guaranteed.
 	 * 
-	 * der erstellte knoten wird in die nodelist hinzugefuegt
+	 * @param x x-koordinate of the Node to create
+	 * @param y y-koordinate of the Node to create
+	 * @param value value of the Node to create
 	 */
 	public synchronized void createNewNode(int x, int y, double value) {
 		
@@ -163,15 +182,19 @@ public class Column implements Runnable {
 				.getRateForTarget(x, y, Neighbor.Left);
 		double rateRight = matrix.graph.getRateForTarget(x, y,
 				Neighbor.Right);
-		Node node = new Node(this, x, y, value, rateTop, rateBottom,
+		Node node = new Node(x, y, value, rateTop, rateBottom,
 				rateLeft, rateRight);
 		
 		insertQueue.add(node);
 	}
 	
-	
-	/*
-	 * hinzufuegen des initialen nodes
+
+	/**
+	 * we create the initial node in this column.
+	 * 
+	 * @param x x-koordinate of the Node to create
+	 * @param y y-koordinate of the Node to create
+	 * @param value value of the Node to create
 	 */
 	public synchronized void createInitialNode(int x, int y, double value) {
 		if (nodeMap.get(y) == null) {
@@ -182,7 +205,7 @@ public class Column implements Runnable {
 					.getRateForTarget(x, y, Neighbor.Left);
 			double rateRight = matrix.graph.getRateForTarget(x, y,
 					Neighbor.Right);
-			Node node = new Node(this, x, y, value, rateTop, rateBottom,
+			Node node = new Node(x, y, value, rateTop, rateBottom,
 					rateLeft, rateRight);
 			nodeMap.put(y, node);
 		} else {
@@ -190,45 +213,40 @@ public class Column implements Runnable {
 		}
 	}
 
-	/*
-	 * startet Iteration ueber jeden Knoten, in dem dann Communicate auf dem
-	 * Node mit den entsprechenden Nachbarnodes aufgerufen wird.
+
+	
+	/**
+	 * Starts iteration on this column which calls communicate on every node
 	 */
 	private void startCommunicate() {
 		for (Node node : nodeMap.values()) {
-			if (node != null)// if you do not put nulls in there you can delete
-								// this line
-				communicate(node);
+			communicate(node);
 		}
 	}
 
-	/*
-	 * startet Iteration ueber jeden Knoten, in dem dann Communicate auf dem
-	 * Node mit den entsprechenden Nachbarnodes aufgerufen wird.
+
+	/**
+	 * Starts iteration on this column which calls flow on every node
 	 */
 	private void startFlow() {
 		for (Node node : nodeMap.values()) {
-			if (node != null)// if you do not put nulls in there you can delete
-								// this line
-				flow(node);
-		}
-	}
-
-	/*
-	 * starts iteration over all nodes to call the function 'calculate' of every node
-	 *  to estimate the outflow values of every node
-	 */
-	private void startCalculate() {
-		for (Node node : nodeMap.values()) {
-			if (node != null)// if you do not put nulls in there you can delete
-								// this line
-				node.calculate();
+			flow(node);
 		}
 	}
 
 	
 	/**
-	 * starts iteration over all nodes to 'update' the variable value_old of every node in this column
+	 * Starts iteration on this column which calls calculate on every node
+	 */
+	private void startCalculate() {
+		for (Node node : nodeMap.values()) {
+			node.calculate();
+		}
+	}
+
+	
+	/**
+	 * starts iteration on this column to 'update' the variable value_old of every node in this column
 	 */
 	private void startPreciseTest() {
 		for (Node node : nodeMap.values()) {
@@ -241,7 +259,7 @@ public class Column implements Runnable {
 	
 	/**
 	 * This function computes the sum of all right akkus of all nodes in this column and returns the result
-	 * @return double : Retzurns the rightoutflow
+	 * @return double : Returns the rightoutflow
 	 */
 	public double rightOutflow() {
 		double rightOutflow = 0.0;
@@ -258,7 +276,7 @@ public class Column implements Runnable {
 	
 	/**
 	 * This function computes the sum of all left akkus of all nodes in this column and returns the result
-	 * @return double : Retzurns the leftoutflow
+	 * @return double : Returns the leftoutflow
 	 */
 	public double leftOutflow() {
 		double leftOutflow = 0.0;
@@ -274,7 +292,8 @@ public class Column implements Runnable {
 
 	
 	/**
-	 * We proof wheter inflow = outflow +- epsilion or not. 
+	 * We check whether rightInflow - rightOutflow <= epsilon AND leftInflow - leftOutflow <= epsilon and returns the result
+	 * 
 	 * @return boolean: Returns true if the outflow of this colummn is the inflow +- epsilion othwerwise it returns false.
 	 */
 	public boolean checkLocalTerminate() {
@@ -311,7 +330,7 @@ public class Column implements Runnable {
 
 	
 	/**
-	 * @return boolean: Returns wheter all nodes of this column fullfill our properties of precisetest or not
+	 * @return boolean: Returns whether all nodes of this column fulfill our properties of precisetest or not
 	 */
 	public double checkPreciseTest() {
 		double epsilon = matrix.epsilon;	
@@ -323,41 +342,38 @@ public class Column implements Runnable {
 		return diffsum;
 	}
 
-	/*
-	 * die Funktionalitaet einer Column iteriert grundsaetzlich immer
-	 * barrierCount-mal.
+	
+	 /**
+	 * function which starts the main process of a column. Generally we iterate
+	 * barriercount times (was set earlier) and every iteration calls startCalculate
+	 * which calculates the akkus of every node in this column, afterwards startflow()
+	 * is called which starts moving the top and bottom akkus inside this column,
+	 * afterwards all new nodes waiting in the queue are inserted into the hashmap
+	 * by calling insertEverythingFromQueue().
 	 * 
-	 * im ersten Schritt wird fuer jeden enthaltenen Node zuerst einmal
-	 * calculate() aufgerufen, anschliessend einmal flow() auf allen um den
-	 * Ausstausch innerhalb der Spalte zu realisieren. Nach barriercount
-	 * Durchlaeufen tritt der Threat in die Barrier barrier1 ein. Wenn alle
-	 * Column-threats die Barrier erreicht haben testet die Barrier ob
-	 * preciseTest != true. Falls das gilt checkt die Barrier die
-	 * Spaltenterminierung indem sie auf jeder Spalte checkLocalTest() aufruft.
-	 * Falls dies fuer jede Spalte true ist setzt die barrier fuer jede Spalte
-	 * precisetest = true ueber die methode setPreciseTest() in Picture.
+	 * After this iteration Block every column waits for barrier1. In barrier1 we
+	 * check for convergence in every column. If every column meets the conditions
+	 * we start the preciseTest, which will change the behaviour of this run() method
+	 * mainly by setting barriercount to 1.
 	 * 
-	 * Nachdem barrier1 fertig ist werden die threads Column fortgesetzt und
-	 * jede Spalte ruft communcate() auf jedem ihrer Knoten auf. Nach diesem
-	 * Communicate- Aufruf wartet jeder Threat auf barrier2.
+	 * After barrier1 every column calls startsCommunicate() which moves akkuLeft and
+	 * akkuRight of the nodes to neighbour nodes in neighbourcolumns.
 	 * 
-	 * Sobald jeder thread in barrier2 angekommen ist testet barrier2 ob
-	 * precisetest=true. Falls ja iteriert barrier2 ueber alle nodes in jeder
-	 * column und addiert die unterschiede zwischen value und value_old jedes
-	 * Nodes auf. Sobald diese Summe > epsilon ist kann abgebrochen werden.
-	 * Falls die Summe der Unterschiede in ALLEN nodes < epsilon erkennen wir
-	 * globale konvergenz und rufen in picture terminateThreats() auf.
+	 * Afterwards every Column waits for barrier15 to be sure that every column finished
+	 * communicting.
 	 * 
-	 * Die threads werden wieder fortgesetzt und falls nun preciseTest = true
-	 * wird fuer jeden enthaltenen node value_old = value gesetzt und
-	 * anschliessend auf barrier3 gewartet. Barrier3 implementiert keine eigene
-	 * run methode, sie sorgt nur dafuer das this.run() erst nach setzen von
-	 * allen value_old geschieht Falls precisetest = false war wird direkt
-	 * this.run aufgerufen und kein warten auf barrier3 notwendig.
+	 * Afterwards we call insertEverythingFromQueue() again to add all new nodes which
+	 * were created during communicate in the hashmap. And we wait for barrier2.
 	 * 
-	 * Nachtrag:
-	 * barrier15 sorgt dafuer das neue knoten in jeder column erst dann eingefuegt
-	 * werden wenn jede spalte fertig communicated hat
+	 * Barrier2 will print testresults depending on the input for testResultcount and
+	 * will check for global convergence if precisetest is already started.
+	 * 
+	 * after barrier2 we check if our thread was terminated with terminateall()
+	 * if this is the case we stop our run, otherwise we check if precisetest is
+	 * already enabled. If yes we set value_old to the current value of every
+	 * node contained in this column. 
+	 * 
+	 * If we did not terminate at this point we start run again.
 	 * 
 	 * @see java.lang.Runnable#run()
 	 */

@@ -11,6 +11,15 @@ import com.google.gson.Gson;
 
 public class NPOsmose {
 
+	/**
+	 * @param args 
+	 * first Argument: Path of the json File containing Picture details, 
+	 * second Argument: (optional) value for barriercount override
+	 * third Argument: (optional) value for testResultCounter (0 = disable testresults)
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		Gson gson = new Gson();
 		String json = "";

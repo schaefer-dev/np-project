@@ -156,10 +156,13 @@ public class Picture implements ImageConvertible{
 				if (!preciseTest){
 					return;
 				}
+				double epsilon2  = epsilon * epsilon;
+				double diffsums = 0.0;
 				
 				for (int i = 0; i < width; i++){
-					if (!columnList.get(i).checkPreciseTest()){
-						return;   	// we can return as soon as we find ONE column which does not fullfill our conditions
+					diffsums += columnList.get(i).checkPreciseTest();
+					if (diffsums > epsilon2){
+						return;   	// we can return as soon as we find ONE column which does NOT fullfill our conditions
 									// for precise termination
 					}
 						

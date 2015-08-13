@@ -313,17 +313,14 @@ public class Column implements Runnable {
 	/**
 	 * @return boolean: Returns wheter all nodes of this column fullfill our properties of precisetest or not
 	 */
-	public boolean checkPreciseTest() {
+	public double checkPreciseTest() {
 		double epsilon = matrix.epsilon;	
+		double diffsum = 0.0;
 		
 		for (Node node : nodeMap.values()) {
-			double step = Math.pow((node.getValue() - node.getValue_old()),2);
-			double euklidnorm = Math.sqrt( step ) ;
-			if (euklidnorm > epsilon){
-				return false;
-			}
+			diffsum += Math.pow((node.getValue() - node.getValue_old()),2);		
 		}
-		return true;
+		return diffsum;
 	}
 
 	/*

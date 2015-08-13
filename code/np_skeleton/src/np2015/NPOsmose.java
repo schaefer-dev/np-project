@@ -31,7 +31,7 @@ public class NPOsmose {
 		
 		int width = ginfo.width;
 		int height = ginfo.height;
-		int barriercount = 10000;
+		int barriercount = 1000;
 		double epsilon = ginfo.epsilon;
 		//double epsilon = 500000000;
 		

@@ -215,8 +215,8 @@ public class Column implements Runnable {
 	}
 
 	/*
-	 * startet Iteration ueber jeden Knoten, in dem dann calculate auf dem Node
-	 * aufgerufen wird.
+	 * starts iteration over all nodes to call the function 'calculate' of every node
+	 *  to estimate the outflow values of every node
 	 */
 	private void startCalculate() {
 		for (Node node : nodeMap.values()) {
@@ -226,9 +226,9 @@ public class Column implements Runnable {
 		}
 	}
 
-	/*
-	 * startet Iteration ueber jeden Knoten um value_old zu speichern / zu
-	 * 'erneuern'
+	
+	/**
+	 * starts iteration over all nodes to 'update' the variable value_old of every node in this column
 	 */
 	private void startPreciseTest() {
 		for (Node node : nodeMap.values()) {
@@ -238,7 +238,11 @@ public class Column implements Runnable {
 		}
 
 	}
-
+	
+	/**
+	 * This function computes the sum of all right akkus of all nodes in this column and returns the result
+	 * @return double : Retzurns the rightoutflow
+	 */
 	public double rightOutflow() {
 		double rightOutflow = 0.0;
 
@@ -251,6 +255,11 @@ public class Column implements Runnable {
 		return rightOutflow;
 	}
 
+	
+	/**
+	 * This function computes the sum of all left akkus of all nodes in this column and returns the result
+	 * @return double : Retzurns the leftoutflow
+	 */
 	public double leftOutflow() {
 		double leftOutflow = 0.0;
 
@@ -263,9 +272,10 @@ public class Column implements Runnable {
 		return leftOutflow;
 	}
 
-	/*
-	 * wir checken lokale Konvergenz indem wir fuer die Spalte testen ob inflow
-	 * = outflow +- epsilon
+	
+	/**
+	 * We proof wheter inflow = outflow +- epsilion or not. 
+	 * @return boolean: Returns true if the outflow of this colummn is the inflow +- epsilion othwerwise it returns false.
 	 */
 	public boolean checkLocalTerminate() {
 
@@ -299,9 +309,9 @@ public class Column implements Runnable {
 		return rightKonvergenz;
 	}
 
-	/*
-	 * wir checken ob alle nodes dieser column die eigenschaft unseres
-	 * precisetest erfuellen!
+	
+	/**
+	 * @return boolean: Returns wheter all nodes of this column fullfill our properties of precisetest or not
 	 */
 	public boolean checkPreciseTest() {
 		double epsilon = matrix.epsilon;
@@ -450,14 +460,26 @@ public class Column implements Runnable {
 		}
 	}
 
+	/**
+	 * @return: If preciseTest is true it returns true otherwise it returns false.
+	 */
 	public boolean isPreciseTest() {
 		return preciseTest;
 	}
 
+	/**
+	 * Sets the variable preciseTest to the given parameter
+	 * @param preciseTest to set the value of the variable preciseTest 
+	 */
 	public void setPreciseTest(boolean preciseTest) {
 		this.preciseTest = preciseTest;
 	}
 
+	/**
+	 * Returns the value of the node on position y. If there isn't a node at this position it returns 0.0 
+	 * @param int y: the y-coordinate of the wanted node
+	 * @return double: The value of the wanted node
+	 */
 	public double getValueAtY(int y) {
 		Node node = nodeMap.get(y);
 		if (node == null)

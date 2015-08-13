@@ -138,7 +138,7 @@ public class Picture implements ImageConvertible{
 			
 			@Override
 			public void run() {
-				if ((counter % 10) == 0){
+				if ((counter % 1000) == 0){
 					graph.write2File("./testresult"+namecounter+".txt", pic);
 					System.out.println("new testresult"+namecounter+".txt printed!");
 					counter++;

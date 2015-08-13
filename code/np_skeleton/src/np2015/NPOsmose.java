@@ -29,47 +29,40 @@ public class NPOsmose {
 		
 		// Your implementation can now access ginfo to read out all important values
 		
+		// zusaetzlicher input fuer 1. int:barriercount 2. zwischenergebnisse alle x erreichen von Barriercount(0 = keine zwischenergebnisse)
+		int barriercount = 100000;
+		
+		int testresultcounter = 0;
+		
+		if (args.length >= 2){
+			barriercount = Integer.parseInt(args[1]);
+			System.out.println("Barriercount was set to: "+barriercount);
+		}else{
+			System.out.println("you could set the number of iterations before reaching the barrier in your second argument! Default: "+barriercount);
+		}
+		
+		
+		if (args.length >= 3){
+			testresultcounter = Integer.parseInt(args[2]);
+			System.out.println("testresults every (" + testresultcounter+ " x barriercount) is enabled");
+		}else{
+			System.out.println("you could set the number of (iterations x barriercount) to print testresults in your third argument! Default: "+testresultcounter);
+		}
+		
+		
 		int width = ginfo.width;
 		int height = ginfo.height;
-		int barriercount = 1000;
-		double epsilon = ginfo.epsilon;
-		//double epsilon = 500000000;
 		
-		System.out.println(ginfo.column2row2initialValue.toString());
+		double epsilon = ginfo.epsilon;
 		
 		int x = ginfo.column2row2initialValue.keySet().iterator().next();
 		int y = ginfo.column2row2initialValue.values().iterator().next().keySet().iterator().next();
 		double value = ginfo.column2row2initialValue.values().iterator().next().values().iterator().next();
 		
-		System.out.println("x " + x+ " -- y "+y + " -- value: "+value);
+		System.out.println("Initial Node: x " + x+ " -- y "+y + " -- value: "+value);
 		
 		
-		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount); // <--- you should implement ImageConvertible to write the graph out
-		
-		/////////////////////////OBSERVER/////////////////////
-		
-		Thread obs = new Thread(new Runnable() { public void run() { 
-			int counter = 0;
-			while(true)	{
-				try {
-					System.in.read();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				ginfo.write2File("./testresult"+counter+".txt", graph);
-				System.out.println("new testresult"+counter+".txt printed!");
-				counter++;
-			}
-			
-		}});
-		
-		//obs.start();
-		
-		
-		
-		
-		/////////////////////OBSERVEREND///////////////////////
+		ImageConvertible graph = new Picture(ginfo,width,height,x,y,value,epsilon,barriercount,testresultcounter); // <--- you should implement ImageConvertible to write the graph out
 		
 
 		graph.runAllColumns();

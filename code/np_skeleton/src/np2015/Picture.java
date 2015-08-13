@@ -25,6 +25,7 @@ public class Picture implements ImageConvertible{
     private CyclicBarrier barrier3;
     private Picture pic = this;    // DEBUG for observer
     public boolean preciseTest;
+    public int testresultcounter;
 	
 	
 	
@@ -36,11 +37,12 @@ public class Picture implements ImageConvertible{
 	 * Im Konstruktor erstellen wir bereits alle benoetigten Spalten und Nodes die fuer das 'momentane' Bild relevant sind.
 	 * 
 	 */
-	public Picture(GraphInfo graph, int width, int height, int x, int y, double value, double epsilon, int barriercount){
+	public Picture(GraphInfo graph, int width, int height, int x, int y, double value, double epsilon, int barriercount, int testresultcounter){
 		this.graph = graph;
 		this.width = width;
 		this.height = height;
 		this.barriercount = barriercount;
+		this.testresultcounter = testresultcounter;
 		this.epsilon = epsilon;
 		
 		this.preciseTest = false;
@@ -138,13 +140,16 @@ public class Picture implements ImageConvertible{
 			
 			@Override
 			public void run() {
-				if ((counter % 1000000000) == 0){
-					graph.write2File("./testresult"+namecounter+".txt", pic);
-					System.out.println("new testresult"+namecounter+".txt printed!");
+				
+				if (testresultcounter != 0){
+					if ((counter % testresultcounter) == 0){
+						graph.write2File("./testresult"+namecounter+".txt", pic);
+						System.out.println("new testresult"+namecounter+".txt printed!");
+						counter++;
+						namecounter++;
+					}
 					counter++;
-					namecounter++;
 				}
-				counter++;
 				
 				
 				//System.out.println("barrier2 reached");

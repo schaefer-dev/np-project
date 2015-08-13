@@ -39,7 +39,7 @@ public class TestPicture {
 		double value = 1.0;
 		double epsilon = ginfo.epsilon;
 		
-		Picture pic = new Picture(ginfo,width, height,1,1,value,epsilon,barriercount);
+		Picture pic = new Picture(ginfo,width, height,1,1,value,epsilon,barriercount,0);
 		
 		assertTrue(value == pic.getValueAt(1, 1));
 		assertTrue(0.0 == pic.getValueAt(0, 1));

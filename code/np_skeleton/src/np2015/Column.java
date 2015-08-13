@@ -314,15 +314,16 @@ public class Column implements Runnable {
 	 * @return boolean: Returns wheter all nodes of this column fullfill our properties of precisetest or not
 	 */
 	public boolean checkPreciseTest() {
-		double epsilon = matrix.epsilon;
-		double diffsum = 0.0;
+		double epsilon = matrix.epsilon;	
+		
 		for (Node node : nodeMap.values()) {
-			if (node != null)// if you do not put nulls in there you can delete
-								// this line
-				diffsum += Math.abs(node.getValue() - node.getValue_old());
+			double step = Math.pow((node.getValue() - node.getValue_old()),2);
+			double euklidnorm = Math.sqrt( step ) ;
+			if (euklidnorm > epsilon){
+				return false;
+			}
 		}
-
-		return (diffsum <= epsilon);
+		return true;
 	}
 
 	/*
@@ -417,7 +418,7 @@ public class Column implements Runnable {
 					}
 				}
 			} else {
-				for (int i = 0; i < (barrierCount / 100); i++) {
+				for (int i = 0; i < 1; i++) {  // da wir nach jedem schritt horizontal propagieren sollen
 					startCalculate();
 					startFlow();
 				}
